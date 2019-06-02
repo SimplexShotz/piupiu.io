@@ -93,7 +93,13 @@ function keyReleased() {
 function miniMap(x, y, w, h) {
   fill(0, 150);
   rect(x, y, w, h);
-  fill(255, 100);
+  fill(255, 50);
+  for (var i in players) {
+    if (players[i].n !== p.n) {
+      ellipse(x + w / 2 + players[i].x / 5000 * w / 2, y + h / 2 + players[i].y / 5000 * h / 2, 5, 5);
+    }
+  }
+  fill(255, 200);
   ellipse(x + w / 2 + p.x / 5000 * w / 2, y + h / 2 + p.y / 5000 * h / 2, 5, 5);
 }
 
@@ -186,7 +192,7 @@ setInterval(function() {
     p.saying.countdown--;
   }
   updatePlayer();
-}, 1000 / 100);
+}, 1000 / 50);
 
 function unload() {
   ref.p.child(p.name + ":" + p.n).remove();
