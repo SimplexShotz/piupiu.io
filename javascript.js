@@ -208,3 +208,7 @@ function unload() {
   ref.p.child(p.name + ":" + p.n).remove();
   p.n = -1;
 };
+
+window.body.ontouchmove = function(e) {
+  e.preventDefault();
+};
