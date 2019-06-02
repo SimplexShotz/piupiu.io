@@ -209,6 +209,6 @@ function unload() {
   p.n = -1;
 };
 
-window.body.ontouchmove = function(e) {
+document.ontouchmove = function(e) {
   e.preventDefault();
 };
