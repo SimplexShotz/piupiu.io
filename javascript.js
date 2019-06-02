@@ -45,37 +45,6 @@ ref.n.once("value", function(data) {
   ref.n.set(d + 1);
 });
 
-// Update health
-ref.p.on("value", function(data) {
-  var d = data.val();
-  if (d && d[p.name + ":" + p.n]) {
-    p.health = d[p.name + ":" + p.n].health;
-    if (p.health <= 0) {
-      unload();
-      p = {
-        name: prompt("Enter a username.").split(".").join("․").split("#").join("").split("$").join("").split("[").join("(").split("]").join(")").split("").splice(0, 16).join("") || "piupiu-io",
-        x: (Math.random() - 0.5) * 2 * 5000,
-        y: (Math.random() - 0.5) * 2 * 5000,
-        n: -1,
-        health: 100,
-        saying: {
-          countdown: 0,
-          t: 0
-        },
-        shooting: {
-          bullets: [],
-          countdown: 0
-        }
-      };
-      ref.n.once("value", function(data) {
-        var d = data.val();
-        p.n = d;
-        ref.n.set(d + 1);
-      });
-    }
-  }
-});
-
 function updatePlayers() {
   ref.p.once("value", function(data) {
     players = [];
@@ -145,6 +114,9 @@ function miniMap(x, y, w, h) {
 
 var ox, oy, l, infot;
 function draw() {
+  if (players[p.n]) {
+    //console.log(players[p.n].health);
+  }
   ox = window.innerWidth / 2 - p.x;
   oy = window.innerHeight / 2 - p.y;
   updatePlayers();
@@ -182,6 +154,33 @@ function draw() {
           fill(0);
           noStroke();
           ellipse(players[i].shooting.bullets[b].x + ox, players[i].shooting.bullets[b].y + oy, 5, 5);
+          if (dist(players[i].shooting.bullets[b].x, players[i].shooting.bullets[b].y, p.x, p.y) <= 27.5) {
+            p.health -= 10;
+            ref.p.child(players[i].name + ":" + players[i].n).child("shooting").child("bullets").child(i).remove();
+            if (p.health <= 0) {
+              unload();
+              p = {
+                name: prompt("Enter a username.").split(".").join("․").split("#").join("").split("$").join("").split("[").join("(").split("]").join(")").split("").splice(0, 16).join("") || "piupiu-io",
+                x: (Math.random() - 0.5) * 2 * 5000,
+                y: (Math.random() - 0.5) * 2 * 5000,
+                n: -1,
+                health: 100,
+                saying: {
+                  countdown: 0,
+                  t: 0
+                },
+                shooting: {
+                  bullets: [],
+                  countdown: 0
+                }
+              };
+              ref.n.once("value", function(data) {
+                var d = data.val();
+                p.n = d;
+                ref.n.set(d + 1);
+              });
+            }
+          }
         }
       }
     }
@@ -267,22 +266,13 @@ setInterval(function() {
           }
         }
       }
-      if (closest.d <= 27.5) {
-        ref.p.once("value", function(data) {
-          var d = data.val();
-          ref.p.child(closest.user).child("health").set(d[closest.user].health - 10);
-        });
-        p.shooting.bullets.splice(i, 1);
-        i--;
-      } else {
-        o = rot(p.shooting.bullets[i].x, p.shooting.bullets[i].y, closest.x, closest.y);
-        p.shooting.bullets[i].xVel += cos(o) * 4;
-        p.shooting.bullets[i].yVel += sin(o) * 4;
-        p.shooting.xVel = constrain(p.shooting.bullets[i].xVel, -25, 25);
-        p.shooting.yVel = constrain(p.shooting.bullets[i].yVel, -25, 25);
-        p.shooting.bullets[i].x += p.shooting.bullets[i].xVel;
-        p.shooting.bullets[i].y += p.shooting.bullets[i].yVel;
-      }
+      o = rot(p.shooting.bullets[i].x, p.shooting.bullets[i].y, closest.x, closest.y);
+      p.shooting.bullets[i].xVel += cos(o) * 4;
+      p.shooting.bullets[i].yVel += sin(o) * 4;
+      p.shooting.xVel = constrain(p.shooting.bullets[i].xVel, -25, 25);
+      p.shooting.yVel = constrain(p.shooting.bullets[i].yVel, -25, 25);
+      p.shooting.bullets[i].x += p.shooting.bullets[i].xVel;
+      p.shooting.bullets[i].y += p.shooting.bullets[i].yVel;
     }
   }
   if (mc && p.shooting.countdown <= 0) {
