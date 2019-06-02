@@ -158,6 +158,6 @@ setInterval(function() {
 }, 1000 / 100);
 
 function unload() {
-  p.n = -1;
   ref.p.child(p.name + ":" + p.n).remove();
+  p.n = -1;
 };
