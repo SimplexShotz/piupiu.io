@@ -275,7 +275,7 @@ setInterval(function() {
       p.shooting.bullets[i].y += p.shooting.bullets[i].yVel;
     }
   }
-  if (mc && p.shooting.countdown <= 0) {
+  if (mc && p.shooting.countdown <= 0 && p.n !== -1) {
     p.shooting.bullets.push({
       x: p.x,
       y: p.y,
@@ -283,15 +283,10 @@ setInterval(function() {
       yVel: sin(off) * 20,
       timer: 200
     });
+    ref.p.child(p.name + ":" + p.n).child("shooting").child("bullets").set(p.shooting.bullets);
     p.shooting.countdown = 10;
   }
-  ref.p.once("value", function(data) {
-    var d = data.val();
-    if (d && d[p.name + ":" + p.n]) {
-      p.shooting.bullets = d[p.name + ":" + p.n].shooting.bullets;
-    }
-    updatePlayer();
-  });
+  updatePlayer();
   mc = false;
 }, 1000 / 50);
 
