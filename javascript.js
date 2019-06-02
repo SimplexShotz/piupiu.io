@@ -130,7 +130,7 @@ function draw() {
   }
   textAlign(LEFT, TOP);
   textSize(12);
-  infot = "V 0.2.0 - Alpha\n(" + l + " online)";
+  infot = "V 0.2.0e - Alpha\n(" + l + " online)";
   fill(0, 150);
   rect(20, 20, textWidth(infot) + 40, 64, 5);
   fill(255, 200);
