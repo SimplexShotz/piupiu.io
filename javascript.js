@@ -93,7 +93,7 @@ function keyReleased() {
 function miniMap(x, y, w, h) {
   fill(0, 150);
   rect(x, y, w, h);
-  fill(255, 50);
+  fill(255, 100);
   for (var i in players) {
     if (players[i].n !== p.n) {
       ellipse(x + w / 2 + players[i].x / 5000 * w / 2, y + h / 2 + players[i].y / 5000 * h / 2, 5, 5);
@@ -103,7 +103,7 @@ function miniMap(x, y, w, h) {
   ellipse(x + w / 2 + p.x / 5000 * w / 2, y + h / 2 + p.y / 5000 * h / 2, 5, 5);
 }
 
-var ox, oy;
+var ox, oy, l, infot;
 function draw() {
   ox = window.innerWidth / 2 - p.x;
   oy = window.innerHeight / 2 - p.y;
@@ -112,10 +112,17 @@ function draw() {
   fill(225);
   rect(-5000 + ox, -5000 + oy, 10000, 10000);
   noStroke();
-  fill(0);
+  l = 0;
+  for (var i in players) {
+    l++;
+  }
+  infot = "V 0.1.2 - Alpha\n(" + l + " online)";
+  fill(0, 150);
+  rect(20, 20, textWidth(infot) + 40, 64, 5);
+  fill(255, 200);
   textAlign(LEFT, TOP);
   textSize(12);
-  text("V 0.1.1 - Alpha", 20, 20);
+  text(infot, 40, 40);
   strokeWeight(5);
   for (var i in players) {
     if (players[i].n !== p.n) {
