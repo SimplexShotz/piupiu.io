@@ -130,7 +130,7 @@ function draw() {
   }
   textAlign(LEFT, TOP);
   textSize(12);
-  infot = "V 0.2.0e2 - Alpha\n(" + l + " online)";
+  infot = "V 0.2.0e3 - Alpha\n(" + l + " online)";
   fill(0, 150);
   rect(20, 20, textWidth(infot) + 40, 64, 5);
   fill(255, 200);
@@ -285,7 +285,13 @@ setInterval(function() {
     });
     p.shooting.countdown = 10;
   }
-  updatePlayer();
+  ref.p.once("value", function(data) {
+    var d = data.val();
+    if (d[p.name + ":" + p.n]) {
+      p.shooting.bullets = d[p.name + ":" + p.n].shooting.bullets;
+    }
+    updatePlayer();
+  });
   mc = false;
 }, 1000 / 50);
 
