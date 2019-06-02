@@ -83,6 +83,11 @@ function keyReleased() {
 function draw() {
   updatePlayers();
   background(225);
+  noStroke();
+  fill(0);
+  textAlign(LEFT, TOP);
+  textSize(12);
+  text("V 0.0.3 - Alpha", 20, 20);
   strokeWeight(5);
   for (var i in players) {
     if (players[i].n !== p.n) {
@@ -146,7 +151,9 @@ setInterval(function() {
   if (kp[40]) {
     p.y += 3;
   }
-  p.saying.countdown--;
+  if (p.saying.countdown > 0) {
+    p.saying.countdown--;
+  }
   updatePlayer();
 }, 1000 / 100);
 
