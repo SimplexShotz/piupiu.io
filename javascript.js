@@ -19,7 +19,7 @@ var ref = {
 
 var players = [];
 var p = {
-  name: prompt("Enter a username.").split(".").join("").split("#").join("").split("$").join("").split("[").join("").split("]").join("")
+  name: prompt("Enter a username.").split(".").join("").split("#").join("").split("$").join("").split("[").join("").split("]").join(""),
   x: Math.random() * window.innerWidth,
   y: Math.random() * window.innerHeight,
   n: -1,
