@@ -53,7 +53,7 @@ updatePlayers();
 
 function updatePlayer() {
   if (p.n !== -1) {
-    ref.p.child(p.name).set(p);
+    ref.p.child(p.name + ":" + p.n).set(p);
   }
 }
 
@@ -152,5 +152,5 @@ setInterval(function() {
 
 function unload() {
   p.n = -1;
-  ref.p.child(p.name).remove();
+  ref.p.child(p.name + ":" + p.n).remove();
 };
