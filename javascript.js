@@ -20,8 +20,8 @@ var ref = {
 var players = [];
 var p = {
   name: prompt("Enter a username.").split(".").join("").split("#").join("").split("$").join("").split("[").join("").split("]").join(""),
-  x: Math.random() * window.innerWidth,
-  y: Math.random() * window.innerHeight,
+  x: (Math.random() - 0.5) * 2 * 5000,
+  y: (Math.random() - 0.5) * 2 * 5000,
   n: -1,
   saying: {
     countdown: 0,
@@ -74,7 +74,6 @@ function rot(x1, y1, x2, y2) {
 
 var kp = [];
 function keyTyped() {
-  console.log(keyCode);
   if (chat.open && keyCode !== 8) {
     chat.t += key;
   }
@@ -91,18 +90,27 @@ function keyReleased() {
   kp[keyCode] = false;
 }
 
+function miniMap(x, y, w, h) {
+  fill(0, 150);
+  rect(x, y, w, h);
+  fill(255, 100);
+  ellipse(x + w / 2 + p.x / 5000 * w / 2, y + h / 2 + p.y / 5000 * h / 2, 5, 5);
+}
+
 var ox, oy;
 function draw() {
+  ox = window.innerWidth / 2 - p.x;
+  oy = window.innerHeight / 2 - p.y;
   updatePlayers();
-  background(225);
+  background(100);
+  fill(225);
+  rect(-5000 + ox, -5000 + oy, 10000, 10000);
   noStroke();
   fill(0);
   textAlign(LEFT, TOP);
   textSize(12);
-  text("V 0.0.3 - Alpha", 20, 20);
+  text("V 0.1.0 - Alpha", 20, 20);
   strokeWeight(5);
-  ox = window.innerWidth / 2 - p.x;
-  oy = window.innerHeight / 2 - p.y;
   for (var i in players) {
     if (players[i].n !== p.n) {
       stroke(50);
@@ -150,6 +158,7 @@ function draw() {
     textAlign(LEFT, CENTER);
     text(chat.t, window.innerWidth / 2 + 45, window.innerHeight / 2);
   }
+  miniMap(window.innerWidth - 120, window.innerHeight - 120, 100, 100);
 }
 
 var off, m;
@@ -159,9 +168,20 @@ setInterval(function() {
   if (m <= 0.05) {
     m = 0;
   }
-  p.x += cos(off) * m * 5;
-  p.y += sin(off) * m * 5;
-  console.log(off);
+  p.x += cos(off) * m * 20;
+  p.y += sin(off) * m * 20;
+  if (p.x < -5000) {
+    p.x = -5000;
+  }
+  if (p.x > 5000) {
+    p.x = 5000;
+  }
+  if (p.y < -5000) {
+    p.y = -5000;
+  }
+  if (p.y > 5000) {
+    p.y = 5000;
+  }
   if (p.saying.countdown > 0) {
     p.saying.countdown--;
   }
