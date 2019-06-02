@@ -59,6 +59,17 @@ function updatePlayer() {
 
 function setup() {
   createCanvas(window.innerWidth, window.innerHeight);
+  angleMode(DEGREES);
+}
+
+function rot(x1, y1, x2, y2) {
+    if (x1 - x2 === 0) {
+        return (y2 >= y1 ? 90 : 270);
+    }
+    if (x2 - x1 > 0 && y2 - y1 < 0) {
+        return atan((y1 - y2) / (x1 - x2)) + 360;
+    }
+    return atan((y1 - y2) / (x1 - x2)) + (x1 >= x2 ? 180 : 0);
 }
 
 var kp = [];
@@ -80,6 +91,7 @@ function keyReleased() {
   kp[keyCode] = false;
 }
 
+var ox, oy;
 function draw() {
   updatePlayers();
   background(225);
@@ -89,32 +101,34 @@ function draw() {
   textSize(12);
   text("V 0.0.3 - Alpha", 20, 20);
   strokeWeight(5);
+  ox = window.innerWidth / 2 - p.x;
+  oy = window.innerHeight / 2 - p.y;
   for (var i in players) {
     if (players[i].n !== p.n) {
       stroke(50);
       fill(200, 50, 50);
-      ellipse(players[i].x, players[i].y, 50, 50);
+      ellipse(players[i].x + ox, players[i].y + oy, 50, 50);
       noStroke();
       fill(0);
       textAlign(CENTER, BOTTOM);
       textSize(24);
-      text(players[i].name, players[i].x, players[i].y - 32);
+      text(players[i].name, players[i].x + ox, players[i].y + oy - 32);
       textSize(16);
       textAlign(CENTER, TOP);
-      text(players[i].saying.t, players[i].x, players[i].y + 32);
+      text(players[i].saying.t, players[i].x + ox, players[i].y + oy + 32);
     }
   }
   stroke(50);
   fill(50, 200, 50);
-  ellipse(p.x, p.y, 50, 50);
+  ellipse(window.innerWidth / 2, window.innerHeight / 2, 50, 50);
   noStroke();
   fill(0);
   textAlign(CENTER, BOTTOM);
   textSize(24);
-  text(p.name, p.x, p.y - 32);
+  text(p.name, window.innerWidth / 2, window.innerHeight / 2 - 32);
   textSize(16);
   textAlign(CENTER, TOP);
-  text(p.saying.t, p.x, p.y + 32);
+  text(p.saying.t, window.innerWidth / 2, window.innerHeight / 2 + 32);
   if (p.saying.countdown <= 0) {
     p.saying.t = "";
   }
@@ -130,27 +144,24 @@ function draw() {
   if (chat.open) {
     noStroke();
     fill(0, 100);
-    rect(p.x + 35, p.y - 30, 200, 60, 10);
+    rect(window.innerWidth / 2 + 35, window.innerHeight / 2 - 30, 200, 60, 10);
     fill(255);
     textSize(20);
     textAlign(LEFT, CENTER);
-    text(chat.t, p.x + 45, p.y);
+    text(chat.t, window.innerWidth / 2 + 45, window.innerHeight / 2);
   }
 }
 
+var off, m;
 setInterval(function() {
-  if (kp[37]) {
-    p.x -= 3;
+  off = rot(window.innerWidth / 2, window.innerHeight / 2, mouseX, mouseY);
+  m = min(dist(window.innerWidth / 2, window.innerHeight / 2, mouseX, mouseY) / min(window.innerHeight / 4, window.innerWidth / 4), 1);
+  if (m <= 0.05) {
+    m = 0;
   }
-  if (kp[38]) {
-    p.y -= 3;
-  }
-  if (kp[39]) {
-    p.x += 3;
-  }
-  if (kp[40]) {
-    p.y += 3;
-  }
+  p.x += cos(off) * m * 5;
+  p.y += sin(off) * m * 5;
+  console.log(off);
   if (p.saying.countdown > 0) {
     p.saying.countdown--;
   }
