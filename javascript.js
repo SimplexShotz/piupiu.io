@@ -19,7 +19,7 @@ var ref = {
 
 var players = [];
 var p = {
-  name: prompt("Enter a username.").split(".").join("").split("#").join("").split("$").join("").split("[").join("").split("]").join(""),
+  name: prompt("Enter a username.").split(".").join("").split("#").join("").split("$").join("").split("[").join("").split("]").join("").split("").splice(0, 16).join("") || "piupiu-io",
   x: (Math.random() - 0.5) * 2 * 5000,
   y: (Math.random() - 0.5) * 2 * 5000,
   n: -1,
@@ -115,7 +115,7 @@ function draw() {
   fill(0);
   textAlign(LEFT, TOP);
   textSize(12);
-  text("V 0.1.0 - Alpha", 20, 20);
+  text("V 0.1.1 - Alpha", 20, 20);
   strokeWeight(5);
   for (var i in players) {
     if (players[i].n !== p.n) {
