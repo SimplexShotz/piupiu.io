@@ -19,16 +19,24 @@ var ref = {
 
 var players = [];
 var p = {
-  name: "user",
+  name: prompt("Enter a username."),
   x: Math.random() * window.innerWidth,
   y: Math.random() * window.innerHeight,
-  n: -1
+  n: -1,
+  saying: {
+    countdown: 0,
+    t: 0
+  }
+};
+
+var chat = {
+  open: false,
+  t: ""
 };
 
 ref.n.once("value", function(data) {
   var d = data.val();
   p.n = d;
-  p.name = "user" + d;
   ref.n.set(d + 1);
 });
 
@@ -43,7 +51,7 @@ function updatePlayers() {
 }
 updatePlayers();
 
-function sendLocation() {
+function updatePlayer() {
   if (p.n !== -1) {
     ref.p.child(p.name).set(p);
   }
@@ -54,8 +62,19 @@ function setup() {
 }
 
 var kp = [];
+function keyTyped() {
+  console.log(keyCode);
+  if (chat.open && keyCode !== 8) {
+    chat.t += key;
+  }
+}
 function keyPressed() {
   kp[keyCode] = true;
+  if (chat.open && keyCode === 8) {
+    chat.t = chat.t.split("");
+    chat.t.pop();
+    chat.t = chat.t.join("");
+  }
 }
 function keyReleased() {
   kp[keyCode] = false;
@@ -63,15 +82,54 @@ function keyReleased() {
 
 function draw() {
   updatePlayers();
-  background(255);
-  stroke(0);
+  background(225);
   strokeWeight(5);
   for (var i in players) {
-    fill(200, 50, 50);
-    if (players[i].n === p.n) {
-      fill(50, 200, 50);
+    if (players[i].n !== p.n) {
+      stroke(50);
+      fill(200, 50, 50);
+      ellipse(players[i].x, players[i].y, 50, 50);
+      noStroke();
+      fill(0);
+      textAlign(CENTER, BOTTOM);
+      textSize(24);
+      text(players[i].name, players[i].x, players[i].y - 32);
+      textSize(16);
+      textAlign(CENTER, TOP);
+      text(players[i].saying.t, players[i].x, players[i].y + 32);
     }
-    ellipse(players[i].x, players[i].y, 50, 50);
+  }
+  stroke(50);
+  fill(50, 200, 50);
+  ellipse(p.x, p.y, 50, 50);
+  noStroke();
+  fill(0);
+  textAlign(CENTER, BOTTOM);
+  textSize(24);
+  text(p.name, p.x, p.y - 32);
+  textSize(16);
+  textAlign(CENTER, TOP);
+  text(p.saying.t, p.x, p.y + 32);
+  if (p.saying.countdown <= 0) {
+    p.saying.t = "";
+  }
+  if (kp[13]) {
+    if (chat.open && chat.t !== "") {
+      p.saying.countdown = 1000;
+      p.saying.t = chat.t;
+      chat.t = "";
+    }
+    chat.open = !chat.open;
+    kp[13] = false;
+  }
+  if (chat.open) {
+    noStroke();
+    fill(0, 100);
+    rect(p.x + 35, p.y - 30, 200, 60, 10);
+    fill(255);
+    textSize(20);
+    textAlign(LEFT, CENTER);
+    text(chat.t, p.x + 45, p.y);
   }
 }
 
@@ -88,7 +146,8 @@ setInterval(function() {
   if (kp[40]) {
     p.y += 3;
   }
-  sendLocation();
+  p.saying.countdown--;
+  updatePlayer();
 }, 1000 / 100);
 
 function unload() {
