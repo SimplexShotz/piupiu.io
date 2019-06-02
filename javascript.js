@@ -23,12 +23,14 @@ var p = {
   x: (Math.random() - 0.5) * 2 * 5000,
   y: (Math.random() - 0.5) * 2 * 5000,
   n: -1,
+  health: 100,
   saying: {
     countdown: 0,
     t: 0
   },
   shooting: {
-    bullets: []
+    bullets: [],
+    countdown: 0
   }
 };
 
@@ -41,6 +43,37 @@ ref.n.once("value", function(data) {
   var d = data.val();
   p.n = d;
   ref.n.set(d + 1);
+});
+
+// Update health
+ref.p.on("value", function(data) {
+  var d = data.val();
+  if (d && d[p.name + ":" + p.n]) {
+    p.health = d[p.name + ":" + p.n].health;
+    if (p.health <= 0) {
+      unload();
+      p = {
+        name: prompt("Enter a username.").split(".").join("․").split("#").join("").split("$").join("").split("[").join("(").split("]").join(")").split("").splice(0, 16).join("") || "piupiu-io",
+        x: (Math.random() - 0.5) * 2 * 5000,
+        y: (Math.random() - 0.5) * 2 * 5000,
+        n: -1,
+        health: 100,
+        saying: {
+          countdown: 0,
+          t: 0
+        },
+        shooting: {
+          bullets: [],
+          countdown: 0
+        }
+      };
+      ref.n.once("value", function(data) {
+        var d = data.val();
+        p.n = d;
+        ref.n.set(d + 1);
+      });
+    }
+  }
 });
 
 function updatePlayers() {
@@ -75,6 +108,7 @@ function rot(x1, y1, x2, y2) {
     return atan((y1 - y2) / (x1 - x2)) + (x1 >= x2 ? 180 : 0);
 }
 
+var mc = false;
 var kp = [];
 function keyTyped() {
   if (chat.open && keyCode !== 8) {
@@ -91,6 +125,9 @@ function keyPressed() {
 }
 function keyReleased() {
   kp[keyCode] = false;
+}
+function mousePressed() {
+  mc = true;
 }
 
 function miniMap(x, y, w, h) {
@@ -139,7 +176,14 @@ function draw() {
       text(players[i].name, players[i].x + ox, players[i].y + oy - 32);
       textSize(16);
       textAlign(CENTER, TOP);
-      text(players[i].saying.t, players[i].x + ox, players[i].y + oy + 32);
+      text(players[i].saying.t + " [" + players[i].health + " HP]", players[i].x + ox, players[i].y + oy + 32);
+      if (players[i].shooting && players[i].shooting.bullets) {
+        for (var b = 0; b < players[i].shooting.bullets.length; b++) {
+          fill(0);
+          noStroke();
+          ellipse(players[i].shooting.bullets[b].x + ox, players[i].shooting.bullets[b].y + oy, 5, 5);
+        }
+      }
     }
   }
   stroke(50);
@@ -152,7 +196,12 @@ function draw() {
   text(p.name, window.innerWidth / 2, window.innerHeight / 2 - 32);
   textSize(16);
   textAlign(CENTER, TOP);
-  text(p.saying.t, window.innerWidth / 2, window.innerHeight / 2 + 32);
+  text(p.saying.t + " [" + p.health + " HP]", window.innerWidth / 2, window.innerHeight / 2 + 32);
+  for (var b = 0; b < p.shooting.bullets.length; b++) {
+    fill(0);
+    noStroke();
+    ellipse(p.shooting.bullets[b].x + ox, p.shooting.bullets[b].y + oy, 5, 5);
+  }
   if (p.saying.countdown <= 0) {
     p.saying.t = "";
   }
@@ -177,7 +226,7 @@ function draw() {
   miniMap(window.innerWidth - 120, window.innerHeight - 120, 100, 100);
 }
 
-var off, m;
+var off, m, closest, d, o;
 setInterval(function() {
   off = rot(window.innerWidth / 2, window.innerHeight / 2, mouseX, mouseY);
   m = min(dist(window.innerWidth / 2, window.innerHeight / 2, mouseX, mouseY) / min(window.innerHeight / 4, window.innerWidth / 4), 1);
@@ -186,22 +235,68 @@ setInterval(function() {
   }
   p.x += cos(off) * m * 20;
   p.y += sin(off) * m * 20;
-  if (p.x < -5000) {
-    p.x = -5000;
-  }
-  if (p.x > 5000) {
-    p.x = 5000;
-  }
-  if (p.y < -5000) {
-    p.y = -5000;
-  }
-  if (p.y > 5000) {
-    p.y = 5000;
-  }
+  p.x = constrain(p.x, -5000, 5000);
+  p.y = constrain(p.y, -5000, 5000);
   if (p.saying.countdown > 0) {
     p.saying.countdown--;
   }
+  if (p.shooting.countdown > 0) {
+    p.shooting.countdown--;
+  }
+  for (var i = 0; i < p.shooting.bullets.length; i++) {
+    p.shooting.bullets[i].timer--;
+    if (p.shooting.bullets[i].timer <= 0) {
+      p.shooting.bullets.splice(i, 1);
+      i--;
+    } else {
+      closest = {
+        x: 0,
+        y: 0,
+        d: Infinity
+      };
+      for (var j = 0; j < players.length; j++) {
+        if (players[j] && players[j].n !== p.n) {
+          d = dist(p.shooting.bullets[i].x, p.shooting.bullets[i].y, players[j].x, players[j].y);
+          if (d < closest.d) {
+            closest = {
+              user: players[j].name + ":" + players[j].n,
+              x: players[j].x,
+              y: players[j].y,
+              d: d
+            };
+          }
+        }
+      }
+      if (closest.d <= 27.5) {
+        ref.p.once("value", function(data) {
+          var d = data.val();
+          ref.p.child(closest.user).child("health").set(d[closest.user].health - 10);
+        });
+        p.shooting.bullets.splice(i, 1);
+        i--;
+      } else {
+        o = rot(p.shooting.bullets[i].x, p.shooting.bullets[i].y, closest.x, closest.y);
+        p.shooting.bullets[i].xVel += cos(o) * 4;
+        p.shooting.bullets[i].yVel += sin(o) * 4;
+        p.shooting.xVel = constrain(p.shooting.bullets[i].xVel, -25, 25);
+        p.shooting.yVel = constrain(p.shooting.bullets[i].yVel, -25, 25);
+        p.shooting.bullets[i].x += p.shooting.bullets[i].xVel;
+        p.shooting.bullets[i].y += p.shooting.bullets[i].yVel;
+      }
+    }
+  }
+  if (mc && p.shooting.countdown <= 0) {
+    p.shooting.bullets.push({
+      x: p.x,
+      y: p.y,
+      xVel: cos(off) * 20,
+      yVel: sin(off) * 20,
+      timer: 200
+    });
+    p.shooting.countdown = 10;
+  }
   updatePlayer();
+  mc = false;
 }, 1000 / 50);
 
 function unload() {
