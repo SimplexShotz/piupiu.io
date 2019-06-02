@@ -1,5 +1,5 @@
 
-// Your web app's Firebase configuration
+// Firebase config.
 var firebaseConfig = {
   apiKey: "AIzaSyDpuv9Cct6f-UDYFsRJUJRrHa5Sf8WoLxA",
   authDomain: "piupiu-io.firebaseapp.com",
@@ -26,6 +26,9 @@ var p = {
   saying: {
     countdown: 0,
     t: 0
+  },
+  shooting: {
+    bullets: []
   }
 };
 
@@ -116,12 +119,12 @@ function draw() {
   for (var i in players) {
     l++;
   }
+  textAlign(LEFT, TOP);
+  textSize(12);
   infot = "V 0.1.2 - Alpha\n(" + l + " online)";
   fill(0, 150);
   rect(20, 20, textWidth(infot) + 40, 64, 5);
   fill(255, 200);
-  textAlign(LEFT, TOP);
-  textSize(12);
   text(infot, 40, 40);
   strokeWeight(5);
   for (var i in players) {
