@@ -1,5 +1,5 @@
 
-var ver = "V 0.3.0 - Alpha";
+var ver = "V 0.3.0e1 - Alpha";
 
 // Firebase config.
 var firebaseConfig = {
@@ -35,7 +35,7 @@ var p = {
     bullets: [],
     countdown: 0
   },
-  hit_immunity: 600
+  hit_immunity: 200
 };
 
 var chat = {
@@ -67,7 +67,7 @@ function checkHit() {
     if (d[p.name + ":" + p.n]) {
       ref.hit.child(p.name + ":" + p.n).set(false);
       if (p.hit_immunity <= 0) {
-        p.hit_immunity = 60;
+        p.hit_immunity = 20;
         p.health -= 10;
         if (p.health <= 0) {
           unload();
@@ -84,7 +84,8 @@ function checkHit() {
             shooting: {
               bullets: [],
               countdown: 0
-            }
+            },
+            hit_immunity: 200
           };
           ref.n.once("value", function(data) {
             var d = data.val();
@@ -183,7 +184,7 @@ function draw() {
     if (players[i].n !== p.n) {
       stroke(50);
       if (players[i].hit_immunity > 0) {
-        stroke(50, 200, 255);
+        stroke(25, 100, 200);
       }
       fill(200, 50, 50);
       ellipse(players[i].x + ox, players[i].y + oy, 50, 50);
@@ -206,7 +207,7 @@ function draw() {
   }
   stroke(50);
   if (p.hit_immunity > 0) {
-    stroke(50, 200, 255);
+    stroke(25, 100, 200);
   }
   fill(50, 200, 50);
   ellipse(window.innerWidth / 2, window.innerHeight / 2, 50, 50);
