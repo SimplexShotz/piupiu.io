@@ -1,5 +1,5 @@
 
-var ver = "V 0.2.0e9 - Alpha";
+var ver = "V 0.3.0 - Alpha";
 
 // Firebase config.
 var firebaseConfig = {
@@ -34,7 +34,8 @@ var p = {
   shooting: {
     bullets: [],
     countdown: 0
-  }
+  },
+  hit_immunity: 600
 };
 
 var chat = {
@@ -65,29 +66,32 @@ function checkHit() {
     var d = data.val();
     if (d[p.name + ":" + p.n]) {
       ref.hit.child(p.name + ":" + p.n).set(false);
-      p.health -= 10;
-      if (p.health <= 0) {
-        unload();
-        p = {
-          name: prompt("Enter a username.").split(".").join("․").split("#").join("").split("$").join("").split("[").join("(").split("]").join(")").split("").splice(0, 16).join("") || "piupiu-io",
-          x: (Math.random() - 0.5) * 2 * 5000,
-          y: (Math.random() - 0.5) * 2 * 5000,
-          n: -1,
-          health: 100,
-          saying: {
-            countdown: 0,
-            t: 0
-          },
-          shooting: {
-            bullets: [],
-            countdown: 0
-          }
-        };
-        ref.n.once("value", function(data) {
-          var d = data.val();
-          p.n = d;
-          ref.n.set(d + 1);
-        });
+      if (p.hit_immunity <= 0) {
+        p.hit_immunity = 60;
+        p.health -= 10;
+        if (p.health <= 0) {
+          unload();
+          p = {
+            name: prompt("Enter a username.").split(".").join("․").split("#").join("").split("$").join("").split("[").join("(").split("]").join(")").split("").splice(0, 16).join("") || "piupiu-io",
+            x: (Math.random() - 0.5) * 2 * 5000,
+            y: (Math.random() - 0.5) * 2 * 5000,
+            n: -1,
+            health: 100,
+            saying: {
+              countdown: 0,
+              t: 0
+            },
+            shooting: {
+              bullets: [],
+              countdown: 0
+            }
+          };
+          ref.n.once("value", function(data) {
+            var d = data.val();
+            p.n = d;
+            ref.n.set(d + 1);
+          });
+        }
       }
     }
   });
@@ -151,6 +155,7 @@ function miniMap(x, y, w, h) {
 
 var ox, oy, l, infot;
 function draw() {
+  p.hit_immunity--;
   if (players[p.n]) {
     //console.log(players[p.n].health);
   }
@@ -177,6 +182,9 @@ function draw() {
   for (var i in players) {
     if (players[i].n !== p.n) {
       stroke(50);
+      if (players[i].hit_immunity > 0) {
+        stroke(50, 200, 255);
+      }
       fill(200, 50, 50);
       ellipse(players[i].x + ox, players[i].y + oy, 50, 50);
       noStroke();
@@ -192,38 +200,14 @@ function draw() {
           fill(0);
           noStroke();
           ellipse(players[i].shooting.bullets[b].x + ox, players[i].shooting.bullets[b].y + oy, 5, 5);
-          /* if (dist(players[i].shooting.bullets[b].x, players[i].shooting.bullets[b].y, p.x, p.y) <= 27.5) {
-            p.health -= 10;
-            ref.p.child(players[i].name + ":" + players[i].n).child("shooting").child("bullets").child(b).remove();
-            if (p.health <= 0) {
-              unload();
-              p = {
-                name: prompt("Enter a username.").split(".").join("․").split("#").join("").split("$").join("").split("[").join("(").split("]").join(")").split("").splice(0, 16).join("") || "piupiu-io",
-                x: (Math.random() - 0.5) * 2 * 5000,
-                y: (Math.random() - 0.5) * 2 * 5000,
-                n: -1,
-                health: 100,
-                saying: {
-                  countdown: 0,
-                  t: 0
-                },
-                shooting: {
-                  bullets: [],
-                  countdown: 0
-                }
-              };
-              ref.n.once("value", function(data) {
-                var d = data.val();
-                p.n = d;
-                ref.n.set(d + 1);
-              });
-            }
-          }*/
         }
       }
     }
   }
   stroke(50);
+  if (p.hit_immunity > 0) {
+    stroke(50, 200, 255);
+  }
   fill(50, 200, 50);
   ellipse(window.innerWidth / 2, window.innerHeight / 2, 50, 50);
   noStroke();
@@ -240,7 +224,7 @@ function draw() {
     ellipse(p.shooting.bullets[b].x + ox, p.shooting.bullets[b].y + oy, 5, 5);
     if (p.n !== -1) {
       for (var i in players) {
-        if (players[i].n !== p.n) {
+        if (players[i].n !== p.n && players[i].hit_immunity <= 0) {
           if (dist(p.shooting.bullets[b].x, p.shooting.bullets[b].y, players[i].x, players[i].y) <= 27.5) {
             ref.hit.child(players[i].name + ":" + players[i].n).set(true);
             p.shooting.bullets.splice(b, 1);
