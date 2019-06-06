@@ -14,7 +14,8 @@ firebase.initializeApp(firebaseConfig);
 var database = firebase.database();
 var ref = {
   n: database.ref("n"), // unique number is given to each player
-  p: database.ref("p")
+  p: database.ref("p"),
+  hit: database.ref("hit")
 };
 
 var players = [];
@@ -130,7 +131,7 @@ function draw() {
   }
   textAlign(LEFT, TOP);
   textSize(12);
-  infot = "V 0.2.0e4 - Alpha\n(" + l + " online)";
+  infot = "V 0.2.0e5 - Alpha\n(" + l + " online)";
   fill(0, 150);
   rect(20, 20, textWidth(infot) + 40, 64, 5);
   fill(255, 200);
@@ -154,7 +155,7 @@ function draw() {
           fill(0);
           noStroke();
           ellipse(players[i].shooting.bullets[b].x + ox, players[i].shooting.bullets[b].y + oy, 5, 5);
-          if (dist(players[i].shooting.bullets[b].x, players[i].shooting.bullets[b].y, p.x, p.y) <= 27.5) {
+          /* if (dist(players[i].shooting.bullets[b].x, players[i].shooting.bullets[b].y, p.x, p.y) <= 27.5) {
             p.health -= 10;
             ref.p.child(players[i].name + ":" + players[i].n).child("shooting").child("bullets").child(b).remove();
             if (p.health <= 0) {
@@ -180,7 +181,7 @@ function draw() {
                 ref.n.set(d + 1);
               });
             }
-          }
+          }*/
         }
       }
     }
@@ -283,7 +284,7 @@ setInterval(function() {
       yVel: sin(off) * 20,
       timer: 200
     });
-    ref.p.child(p.name + ":" + p.n).child("shooting").child("bullets").set(p.shooting.bullets);
+    //ref.p.child(p.name + ":" + p.n).child("shooting").child("bullets").set(p.shooting.bullets);
     p.shooting.countdown = 10;
   }
   updatePlayer();
