@@ -238,12 +238,14 @@ function draw() {
     fill(0);
     noStroke();
     ellipse(p.shooting.bullets[b].x + ox, p.shooting.bullets[b].y + oy, 5, 5);
-    for (var i = 0; i < players.length; i++) {
-      if (players[i].n !== p.n) {
-        if (dist(p.shooting.bullets[b].x, p.shooting.bullets[b].y, players[i].x, players[i].y) <= 27.5) {
-          ref.hit.child(players[i].name + ":" + players[i].n).set(true);
-          p.shooting.bullets.splice(b, 1);
-          b--;
+    if (p.n !== -1) {
+      for (var i = 0; i < players.length; i++) {
+        if (players[i].n !== p.n) {
+          if (dist(p.shooting.bullets[b].x, p.shooting.bullets[b].y, players[i].x, players[i].y) <= 27.5) {
+            ref.hit.child(players[i].name + ":" + players[i].n).set(true);
+            p.shooting.bullets.splice(b, 1);
+            b--;
+          }
         }
       }
     }
