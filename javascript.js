@@ -43,6 +43,7 @@ var chat = {
 ref.n.once("value", function(data) {
   var d = data.val();
   p.n = d;
+  ref.hit.child(p.name + ":" + d).set(false);
   ref.n.set(d + 1);
 });
 
@@ -57,6 +58,39 @@ function updatePlayers() {
 }
 updatePlayers();
 
+function checkHit() {
+  ref.hit.once("value", function(data) {
+    var d = data.val();
+    if (d[p.name + ":" + p.n]) {
+      ref.hit.child(p.name + ":" + p.n).set(false);
+      p.health -= 10;
+      if (p.health <= 0) {
+        unload();
+        p = {
+          name: prompt("Enter a username.").split(".").join("․").split("#").join("").split("$").join("").split("[").join("(").split("]").join(")").split("").splice(0, 16).join("") || "piupiu-io",
+          x: (Math.random() - 0.5) * 2 * 5000,
+          y: (Math.random() - 0.5) * 2 * 5000,
+          n: -1,
+          health: 100,
+          saying: {
+            countdown: 0,
+            t: 0
+          },
+          shooting: {
+            bullets: [],
+            countdown: 0
+          }
+        };
+        ref.n.once("value", function(data) {
+          var d = data.val();
+          p.n = d;
+          ref.n.set(d + 1);
+        });
+      }
+    }
+  });
+}
+
 function updatePlayer() {
   if (p.n !== -1) {
     ref.p.child(p.name + ":" + p.n).set(p);
@@ -69,13 +103,13 @@ function setup() {
 }
 
 function rot(x1, y1, x2, y2) {
-    if (x1 - x2 === 0) {
-        return (y2 >= y1 ? 90 : 270);
-    }
-    if (x2 - x1 > 0 && y2 - y1 < 0) {
-        return atan((y1 - y2) / (x1 - x2)) + 360;
-    }
-    return atan((y1 - y2) / (x1 - x2)) + (x1 >= x2 ? 180 : 0);
+  if (x1 - x2 === 0) {
+    return (y2 >= y1 ? 90 : 270);
+  }
+  if (x2 - x1 > 0 && y2 - y1 < 0) {
+    return atan((y1 - y2) / (x1 - x2)) + 360;
+  }
+  return atan((y1 - y2) / (x1 - x2)) + (x1 >= x2 ? 180 : 0);
 }
 
 var mc = false;
@@ -121,6 +155,7 @@ function draw() {
   ox = window.innerWidth / 2 - p.x;
   oy = window.innerHeight / 2 - p.y;
   updatePlayers();
+  checkHit();
   background(100);
   fill(225);
   rect(-5000 + ox, -5000 + oy, 10000, 10000);
@@ -293,6 +328,7 @@ setInterval(function() {
 
 function unload() {
   ref.p.child(p.name + ":" + p.n).remove();
+  ref.hit.child(p.name + ":" + p.n).remove();
   p.n = -1;
 };
 
