@@ -1,4 +1,6 @@
 
+var ver = "V 0.2.0e6 - Alpha";
+
 // Firebase config.
 var firebaseConfig = {
   apiKey: "AIzaSyDpuv9Cct6f-UDYFsRJUJRrHa5Sf8WoLxA",
@@ -166,7 +168,7 @@ function draw() {
   }
   textAlign(LEFT, TOP);
   textSize(12);
-  infot = "V 0.2.0e5 - Alpha\n(" + l + " online)";
+  infot = ver + "\n(" + l + " online)";
   fill(0, 150);
   rect(20, 20, textWidth(infot) + 40, 64, 5);
   fill(255, 200);
