@@ -1,5 +1,5 @@
 
-var ver = "V 0.3.1 - Alpha";
+var ver = "V 0.3.1e1 - Alpha";
 
 // Firebase config.
 var firebaseConfig = {
@@ -67,7 +67,7 @@ updatePlayers();
 function checkHit() {
   ref.hit.once("value", function(data) {
     var d = data.val();
-    if (d[p.name + ":" + p.n].state) {
+    if (d[p.name + ":" + p.n] && d[p.name + ":" + p.n].state) {
       ref.hit.child(p.name + ":" + p.n).set({
         state: false,
         by: ""
