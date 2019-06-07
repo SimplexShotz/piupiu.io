@@ -1,5 +1,5 @@
 
-var ver = "V 0.3.1e6 - Alpha";
+var ver = "V 0.3.1e7 - Alpha";
 
 // Firebase config.
 var firebaseConfig = {
@@ -231,7 +231,7 @@ function draw() {
       ellipse(p.shooting.bullets[b].x + ox, p.shooting.bullets[b].y + oy, 5, 5);
       if (p.n !== -1) {
         for (var i in players) {
-          if (players[i]) {
+          if (p.shooting.bullets[b] && players[i]) {
             if (players[i].n !== p.n && players[i].hit_immunity <= 0) {
               if (dist(p.shooting.bullets[b].x, p.shooting.bullets[b].y, players[i].x, players[i].y) <= 27.5) {
                 ref.hit.child(players[i].name + ":" + players[i].n).set({
@@ -240,6 +240,7 @@ function draw() {
                 });
                 p.shooting.bullets.splice(b, 1);
                 b--;
+                break;
               }
             }
           }
