@@ -1,5 +1,5 @@
 
-var ver = "V 0.3.1e1 - Alpha";
+var ver = "V 0.3.1e2 - Alpha";
 
 // Firebase config.
 var firebaseConfig = {
@@ -68,15 +68,10 @@ function checkHit() {
   ref.hit.once("value", function(data) {
     var d = data.val();
     if (d[p.name + ":" + p.n] && d[p.name + ":" + p.n].state) {
-      ref.hit.child(p.name + ":" + p.n).set({
-        state: false,
-        by: ""
-      });
       if (p.hit_immunity <= 0) {
         p.hit_immunity = 20;
         p.health -= 10;
         if (p.health <= 0) {
-          unload();
           p = {
             name: prompt("Killed by " + d[p.name + ":" + p.n].by + "\nEnter a username.").split(".").join("․").split("#").join("").split("$").join("").split("[").join("(").split("]").join(")").split("").splice(0, 16).join("") || "piupiu-io",
             x: (Math.random() - 0.5) * 2 * 5000,
@@ -93,6 +88,7 @@ function checkHit() {
             },
             hit_immunity: 200
           };
+          unload();
           ref.n.once("value", function(data) {
             var d = data.val();
             p.n = d;
@@ -100,6 +96,10 @@ function checkHit() {
           });
         }
       }
+      ref.hit.child(p.name + ":" + p.n).set({
+        state: false,
+        by: ""
+      });
     }
   });
 }
