@@ -1,5 +1,5 @@
 
-var ver = "V 0.3.1e2 - Alpha";
+var ver = "V 0.3.1e3 - Alpha";
 
 // Firebase config.
 var firebaseConfig = {
@@ -323,7 +323,7 @@ setInterval(function() {
       yVel: sin(off) * 15,
       timer: 200
     });
-    p.shooting.countdown = 8;
+    p.shooting.countdown = 2;
   }
   checkHit();
   updatePlayer();
