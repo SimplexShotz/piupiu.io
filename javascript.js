@@ -1,5 +1,5 @@
 
-var ver = "V 0.3.0e1 - Alpha";
+var ver = "V 0.3.1 - Alpha";
 
 // Firebase config.
 var firebaseConfig = {
@@ -46,7 +46,10 @@ var chat = {
 ref.n.once("value", function(data) {
   var d = data.val();
   p.n = d;
-  ref.hit.child(p.name + ":" + d).set(false);
+  ref.hit.child(p.name + ":" + d).set({
+    state: false,
+    by: ""
+  });
   ref.n.set(d + 1);
 });
 
@@ -64,15 +67,18 @@ updatePlayers();
 function checkHit() {
   ref.hit.once("value", function(data) {
     var d = data.val();
-    if (d[p.name + ":" + p.n]) {
-      ref.hit.child(p.name + ":" + p.n).set(false);
+    if (d[p.name + ":" + p.n].state) {
+      ref.hit.child(p.name + ":" + p.n).set({
+        state: false,
+        by: ""
+      });
       if (p.hit_immunity <= 0) {
         p.hit_immunity = 20;
         p.health -= 10;
         if (p.health <= 0) {
           unload();
           p = {
-            name: prompt("Enter a username.").split(".").join("․").split("#").join("").split("$").join("").split("[").join("(").split("]").join(")").split("").splice(0, 16).join("") || "piupiu-io",
+            name: prompt("Killed by " + d[p.name + ":" + p.n].by + "\nEnter a username.").split(".").join("․").split("#").join("").split("$").join("").split("[").join("(").split("]").join(")").split("").splice(0, 16).join("") || "piupiu-io",
             x: (Math.random() - 0.5) * 2 * 5000,
             y: (Math.random() - 0.5) * 2 * 5000,
             n: -1,
@@ -157,9 +163,6 @@ function miniMap(x, y, w, h) {
 var ox, oy, l, infot;
 function draw() {
   p.hit_immunity--;
-  if (players[p.n]) {
-    //console.log(players[p.n].health);
-  }
   ox = window.innerWidth / 2 - p.x;
   oy = window.innerHeight / 2 - p.y;
   updatePlayers();
@@ -227,7 +230,10 @@ function draw() {
       for (var i in players) {
         if (players[i].n !== p.n && players[i].hit_immunity <= 0) {
           if (dist(p.shooting.bullets[b].x, p.shooting.bullets[b].y, players[i].x, players[i].y) <= 27.5) {
-            ref.hit.child(players[i].name + ":" + players[i].n).set(true);
+            ref.hit.child(players[i].name + ":" + players[i].n).set({
+              state: true,
+              by: players[i].name
+            });
             p.shooting.bullets.splice(b, 1);
             b--;
           }
@@ -301,10 +307,10 @@ setInterval(function() {
         }
       }
       o = rot(p.shooting.bullets[i].x, p.shooting.bullets[i].y, closest.x, closest.y);
-      p.shooting.bullets[i].xVel += cos(o) * 4;
-      p.shooting.bullets[i].yVel += sin(o) * 4;
-      p.shooting.xVel = constrain(p.shooting.bullets[i].xVel, -25, 25);
-      p.shooting.yVel = constrain(p.shooting.bullets[i].yVel, -25, 25);
+      p.shooting.bullets[i].xVel += cos(o) * 2;
+      p.shooting.bullets[i].yVel += sin(o) * 2;
+      p.shooting.xVel = constrain(p.shooting.bullets[i].xVel, -15, 15);
+      p.shooting.yVel = constrain(p.shooting.bullets[i].yVel, -15, 15);
       p.shooting.bullets[i].x += p.shooting.bullets[i].xVel;
       p.shooting.bullets[i].y += p.shooting.bullets[i].yVel;
     }
@@ -313,13 +319,13 @@ setInterval(function() {
     p.shooting.bullets.push({
       x: p.x,
       y: p.y,
-      xVel: cos(off) * 20,
-      yVel: sin(off) * 20,
+      xVel: cos(off) * 15,
+      yVel: sin(off) * 15,
       timer: 200
     });
-    //ref.p.child(p.name + ":" + p.n).child("shooting").child("bullets").set(p.shooting.bullets);
-    p.shooting.countdown = 10;
+    p.shooting.countdown = 8;
   }
+  checkHit();
   updatePlayer();
   mc = false;
 }, 1000 / 50);
