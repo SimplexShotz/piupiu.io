@@ -1,5 +1,5 @@
 
-var ver = "V 0.3.1e5 - Alpha";
+var ver = "V 0.3.1e6 - Alpha";
 
 // Firebase config.
 var firebaseConfig = {
@@ -225,19 +225,23 @@ function draw() {
   textAlign(CENTER, TOP);
   text(p.saying.t + " [" + p.health + " HP]", window.innerWidth / 2, window.innerHeight / 2 + 32);
   for (var b = 0; b < p.shooting.bullets.length; b++) {
-    fill(0);
-    noStroke();
-    ellipse(p.shooting.bullets[b].x + ox, p.shooting.bullets[b].y + oy, 5, 5);
-    if (p.n !== -1) {
-      for (var i in players) {
-        if (players[i].n !== p.n && players[i].hit_immunity <= 0) {
-          if (dist(p.shooting.bullets[b].x, p.shooting.bullets[b].y, players[i].x, players[i].y) <= 27.5) {
-            ref.hit.child(players[i].name + ":" + players[i].n).set({
-              state: true,
-              by: p.name
-            });
-            p.shooting.bullets.splice(b, 1);
-            b--;
+    if (p.shooting.bullets[b]) {
+      fill(0);
+      noStroke();
+      ellipse(p.shooting.bullets[b].x + ox, p.shooting.bullets[b].y + oy, 5, 5);
+      if (p.n !== -1) {
+        for (var i in players) {
+          if (players[i]) {
+            if (players[i].n !== p.n && players[i].hit_immunity <= 0) {
+              if (dist(p.shooting.bullets[b].x, p.shooting.bullets[b].y, players[i].x, players[i].y) <= 27.5) {
+                ref.hit.child(players[i].name + ":" + players[i].n).set({
+                  state: true,
+                  by: p.name
+                });
+                p.shooting.bullets.splice(b, 1);
+                b--;
+              }
+            }
           }
         }
       }
