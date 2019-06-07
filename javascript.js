@@ -1,5 +1,5 @@
 
-var ver = "V 0.3.1e7 - Alpha";
+var ver = "V 0.3.1e8 - Alpha";
 
 // Firebase config.
 var firebaseConfig = {
@@ -68,7 +68,7 @@ var by;
 function checkHit() {
   ref.hit.once("value", function(data) {
     var d = data.val();
-    if (d[p.name + ":" + p.n] && d[p.name + ":" + p.n].state) {
+    if (d && d[p.name + ":" + p.n] && d[p.name + ":" + p.n].state) {
       by = d[p.name + ":" + p.n].by;
       ref.hit.child(p.name + ":" + p.n).set({
         state: false,
