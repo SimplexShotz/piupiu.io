@@ -1,5 +1,5 @@
 
-var ver = "V 0.4.0 - Alpha";
+var ver = "V 0.4.0e1 - Alpha";
 
 // Firebase config.
 var firebaseConfig = {
@@ -100,6 +100,7 @@ function checkHit() {
         p.health -= 10;
         if (p.health <= 0) {
           unload();
+          alrt("important", "Killed by " + by + ".");
           document.getElementById("name-container").style.display = "block";
         }
       }
