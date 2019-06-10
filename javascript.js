@@ -1,5 +1,5 @@
 
-var ver = "V 0.4.0e3 - Alpha";
+var ver = "V 0.4.0e4 - Alpha";
 
 // Firebase config.
 var firebaseConfig = {
@@ -365,8 +365,8 @@ setInterval(function() {
 
 function unload() {
   if (p.n !== -1) {
-    ref.p.child(p.name + ":" + p.n).remove();
     ref.hit.child(p.name + ":" + p.n).remove();
+    ref.p.child(p.name + ":" + p.n).remove();
     p.n = -1;
   }
 };
