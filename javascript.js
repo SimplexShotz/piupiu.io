@@ -100,7 +100,11 @@ function checkHit() {
         p.health -= 10;
         if (p.health <= 0) {
           unload();
+          try {
           alrt("important", "Killed by " + by + ".");
+          } catch(e) {
+          alert(e);
+          }
           document.getElementById("name-container").style.display = "block";
         }
       }
