@@ -1,5 +1,5 @@
 
-var ver = "V 0.4.1 - Alpha";
+var ver = "V 0.4.1e1 - Alpha";
 
 // Firebase config.
 var firebaseConfig = {
@@ -229,10 +229,10 @@ function draw() {
         }
       }
       if (players[i].placed) {
-        for (var p in players[i].placed) {
-          for (var j in players[i].placed[p]) {
-            cur = players[i].placed[p][j];
-            switch(p) {
+        for (var pl in players[i].placed) {
+          for (var j in players[i].placed[pl]) {
+            cur = players[i].placed[pl][j];
+            switch(pl) {
               case "turrets":
                 noFill();
                 stroke(0);
@@ -285,10 +285,10 @@ function draw() {
         }
       }
     }
-    for (var p in p.placed) {
-      for (var j in p.placed[p]) {
-        cur = p.placed[p][j];
-        switch(p) {
+    for (var pl in p.placed) {
+      for (var j in p.placed[pl]) {
+        cur = p.placed[pl][j];
+        switch(pl) {
           case "turrets":
             noFill();
             stroke(0);
