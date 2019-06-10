@@ -1,5 +1,5 @@
 
-var ver = "V 0.3.1e8 - Alpha";
+var ver = "V 0.4.0 - Alpha";
 
 // Firebase config.
 var firebaseConfig = {
@@ -22,20 +22,12 @@ var ref = {
 
 var players = [];
 var p = {
-  name: prompt("Enter a username.").split(".").join("․").split("#").join("").split("$").join("").split("[").join("(").split("]").join(")").split("").splice(0, 16).join("") || "piupiu-io",
-  x: (Math.random() - 0.5) * 2 * 5000,
-  y: (Math.random() - 0.5) * 2 * 5000,
-  n: -1,
-  health: 100,
-  saying: {
-    countdown: 0,
-    t: 0
-  },
-  shooting: {
-    bullets: [],
-    countdown: 0
-  },
-  hit_immunity: 200
+  n: -1
+};
+
+var last = {
+  x: 0,
+  y: 0
 };
 
 var chat = {
@@ -43,15 +35,44 @@ var chat = {
   t: ""
 };
 
-ref.n.once("value", function(data) {
-  var d = data.val();
-  p.n = d;
-  ref.hit.child(p.name + ":" + d).set({
-    state: false,
-    by: ""
+var alerts = [];
+
+// important (red), warn (yellow-orange), info (light-blue)
+function alrt(type, txt) {
+  // add to alerts  here - [TODO]
+  var alt = "<div class=\"alert-" + type + "\"><div class=\"icon\">" + (type === "info" ? "i" : "!") + "</div>" + txt + "</div>";
+  document.getElementById("alert-container").innerHTML += alt;
+}
+
+function join_game() {
+  p = {
+    name: document.getElementById("name-input").value.split(".").join("․").split("#").join("").split("$").join("").split("[").join("(").split("]").join(")").split("").splice(0, 16).join("") || "piupiu․io",
+    x: (Math.random() - 0.5) * 2 * 5000,
+    y: (Math.random() - 0.5) * 2 * 5000,
+    n: -1,
+    health: 100,
+    saying: {
+      countdown: 0,
+      t: 0
+    },
+    shooting: {
+      bullets: [],
+      countdown: 0
+    },
+    hit_immunity: 200
+  };
+  ref.n.once("value", function(data) {
+    var d = data.val();
+    p.n = d;
+    ref.hit.child(p.name + ":" + d).set({
+      state: false,
+      by: ""
+    });
+    ref.n.set(d + 1);
   });
-  ref.n.set(d + 1);
-});
+  updatePlayers();
+  document.getElementById("name-container").style.display = "none";
+}
 
 function updatePlayers() {
   ref.p.once("value", function(data) {
@@ -79,27 +100,7 @@ function checkHit() {
         p.health -= 10;
         if (p.health <= 0) {
           unload();
-          p = {
-            name: prompt("Killed by " + by + ".\nEnter a username.").split(".").join("․").split("#").join("").split("$").join("").split("[").join("(").split("]").join(")").split("").splice(0, 16).join("") || "piupiu-io",
-            x: (Math.random() - 0.5) * 2 * 5000,
-            y: (Math.random() - 0.5) * 2 * 5000,
-            n: -1,
-            health: 100,
-            saying: {
-              countdown: 0,
-              t: 0
-            },
-            shooting: {
-              bullets: [],
-              countdown: 0
-            },
-            hit_immunity: 200
-          };
-          ref.n.once("value", function(data) {
-            var d = data.val();
-            p.n = d;
-            ref.n.set(d + 1);
-          });
+          document.getElementById("name-container").style.display = "block";
         }
       }
     }
@@ -136,7 +137,7 @@ function keyTyped() {
 }
 function keyPressed() {
   kp[keyCode] = true;
-  if (chat.open && keyCode === 8) {
+  if (p.n !== -1 && chat.open && keyCode === 8) {
     chat.t = chat.t.split("");
     chat.t.pop();
     chat.t = chat.t.join("");
@@ -158,17 +159,28 @@ function miniMap(x, y, w, h) {
       ellipse(x + w / 2 + players[i].x / 5000 * w / 2, y + h / 2 + players[i].y / 5000 * h / 2, 5, 5);
     }
   }
-  fill(255, 200);
-  ellipse(x + w / 2 + p.x / 5000 * w / 2, y + h / 2 + p.y / 5000 * h / 2, 5, 5);
+  if (p.n !== -1) {
+    fill(255, 200);
+    ellipse(x + w / 2 + p.x / 5000 * w / 2, y + h / 2 + p.y / 5000 * h / 2, 5, 5);
+  }
 }
 
 var ox, oy, l, infot;
 function draw() {
-  p.hit_immunity--;
-  ox = window.innerWidth / 2 - p.x;
-  oy = window.innerHeight / 2 - p.y;
+  if (p.n !== -1) {
+    last.x = p.x;
+    last.y = p.y;
+    p.hit_immunity--;
+    ox = window.innerWidth / 2 - p.x;
+    oy = window.innerHeight / 2 - p.y;
+  } else {
+    ox = window.innerWidth / 2 - last.x;
+    oy = window.innerHeight / 2 - last.y;
+  }
   updatePlayers();
-  checkHit();
+  if (p.n !== -1) {
+    checkHit();
+  }
   background(100);
   fill(225);
   rect(-5000 + ox, -5000 + oy, 10000, 10000);
@@ -210,137 +222,148 @@ function draw() {
       }
     }
   }
-  stroke(50);
-  if (p.hit_immunity > 0) {
-    stroke(25, 100, 200);
-  }
-  fill(50, 200, 50);
-  ellipse(window.innerWidth / 2, window.innerHeight / 2, 50, 50);
-  noStroke();
-  fill(0);
-  textAlign(CENTER, BOTTOM);
-  textSize(24);
-  text(p.name, window.innerWidth / 2, window.innerHeight / 2 - 32);
-  textSize(16);
-  textAlign(CENTER, TOP);
-  text(p.saying.t + " [" + p.health + " HP]", window.innerWidth / 2, window.innerHeight / 2 + 32);
-  for (var b = 0; b < p.shooting.bullets.length; b++) {
-    if (p.shooting.bullets[b]) {
-      fill(0);
-      noStroke();
-      ellipse(p.shooting.bullets[b].x + ox, p.shooting.bullets[b].y + oy, 5, 5);
-      if (p.n !== -1) {
-        for (var i in players) {
-          if (p.shooting.bullets[b] && players[i]) {
-            if (players[i].n !== p.n && players[i].hit_immunity <= 0) {
-              if (dist(p.shooting.bullets[b].x, p.shooting.bullets[b].y, players[i].x, players[i].y) <= 27.5) {
-                ref.hit.child(players[i].name + ":" + players[i].n).set({
-                  state: true,
-                  by: p.name
-                });
-                p.shooting.bullets.splice(b, 1);
-                b--;
-                break;
+  if (p.n !== -1) {
+    stroke(50);
+    if (p.hit_immunity > 0) {
+      stroke(25, 100, 200);
+    }
+    fill(50, 200, 50);
+    ellipse(window.innerWidth / 2, window.innerHeight / 2, 50, 50);
+    noStroke();
+    fill(0);
+    textAlign(CENTER, BOTTOM);
+    textSize(24);
+    text(p.name, window.innerWidth / 2, window.innerHeight / 2 - 32);
+    textSize(16);
+    textAlign(CENTER, TOP);
+    text(p.saying.t + " [" + p.health + " HP]", window.innerWidth / 2, window.innerHeight / 2 + 32);
+    for (var b = 0; b < p.shooting.bullets.length; b++) {
+      if (p.shooting.bullets[b]) {
+        fill(0);
+        noStroke();
+        ellipse(p.shooting.bullets[b].x + ox, p.shooting.bullets[b].y + oy, 5, 5);
+        if (p.n !== -1) {
+          for (var i in players) {
+            if (p.shooting.bullets[b] && players[i]) {
+              if (players[i].n !== p.n && players[i].hit_immunity <= 0) {
+                if (dist(p.shooting.bullets[b].x, p.shooting.bullets[b].y, players[i].x, players[i].y) <= 27.5) {
+                  ref.hit.child(players[i].name + ":" + players[i].n).set({
+                    state: true,
+                    by: p.name
+                  });
+                  p.shooting.bullets.splice(b, 1);
+                  b--;
+                  break;
+                }
               }
             }
           }
         }
       }
     }
-  }
-  if (p.saying.countdown <= 0) {
-    p.saying.t = "";
-  }
-  if (kp[13]) {
-    if (chat.open && chat.t !== "") {
-      p.saying.countdown = 1000;
-      p.saying.t = chat.t;
-      chat.t = "";
+    if (p.saying.countdown <= 0) {
+      p.saying.t = "";
     }
-    chat.open = !chat.open;
-    kp[13] = false;
-  }
-  if (chat.open) {
-    noStroke();
-    fill(0, 100);
-    rect(window.innerWidth / 2 + 35, window.innerHeight / 2 - 30, 200, 60, 10);
-    fill(255);
-    textSize(20);
-    textAlign(LEFT, CENTER);
-    text(chat.t, window.innerWidth / 2 + 45, window.innerHeight / 2);
+    if (kp[13]) {
+      if (chat.open && chat.t !== "") {
+        p.saying.countdown = 1000;
+        p.saying.t = chat.t;
+        chat.t = "";
+      }
+      chat.open = !chat.open;
+      kp[13] = false;
+    }
+    if (chat.open) {
+      noStroke();
+      fill(0, 100);
+      rect(window.innerWidth / 2 + 35, window.innerHeight / 2 - 30, 200, 60, 10);
+      fill(255);
+      textSize(20);
+      textAlign(LEFT, CENTER);
+      text(chat.t, window.innerWidth / 2 + 45, window.innerHeight / 2);
+    }
   }
   miniMap(window.innerWidth - 120, window.innerHeight - 120, 100, 100);
+  if (p.n === -1) {
+    noStroke();
+    fill(0, 50);
+    rect(0, 0, window.innerWidth, window.innerHeight);
+  }
 }
 
 var off, m, closest, d, o;
 setInterval(function() {
-  off = rot(window.innerWidth / 2, window.innerHeight / 2, mouseX, mouseY);
-  m = min(dist(window.innerWidth / 2, window.innerHeight / 2, mouseX, mouseY) / min(window.innerHeight / 4, window.innerWidth / 4), 1);
-  if (m <= 0.05) {
-    m = 0;
-  }
-  p.x += cos(off) * m * 20;
-  p.y += sin(off) * m * 20;
-  p.x = constrain(p.x, -5000, 5000);
-  p.y = constrain(p.y, -5000, 5000);
-  if (p.saying.countdown > 0) {
-    p.saying.countdown--;
-  }
-  if (p.shooting.countdown > 0) {
-    p.shooting.countdown--;
-  }
-  for (var i = 0; i < p.shooting.bullets.length; i++) {
-    p.shooting.bullets[i].timer--;
-    if (p.shooting.bullets[i].timer <= 0) {
-      p.shooting.bullets.splice(i, 1);
-      i--;
-    } else {
-      closest = {
-        x: 0,
-        y: 0,
-        d: Infinity
-      };
-      for (var j = 0; j < players.length; j++) {
-        if (players[j] && players[j].n !== p.n) {
-          d = dist(p.shooting.bullets[i].x, p.shooting.bullets[i].y, players[j].x, players[j].y);
-          if (d < closest.d) {
-            closest = {
-              user: players[j].name + ":" + players[j].n,
-              x: players[j].x,
-              y: players[j].y,
-              d: d
-            };
+  if (p.n !== -1) {
+    off = rot(window.innerWidth / 2, window.innerHeight / 2, mouseX, mouseY);
+    m = min(dist(window.innerWidth / 2, window.innerHeight / 2, mouseX, mouseY) / min(window.innerHeight / 4, window.innerWidth / 4), 1);
+    if (m <= 0.05) {
+      m = 0;
+    }
+    p.x += cos(off) * m * 20;
+    p.y += sin(off) * m * 20;
+    p.x = constrain(p.x, -5000, 5000);
+    p.y = constrain(p.y, -5000, 5000);
+    if (p.saying.countdown > 0) {
+      p.saying.countdown--;
+    }
+    if (p.shooting.countdown > 0) {
+      p.shooting.countdown--;
+    }
+    for (var i = 0; i < p.shooting.bullets.length; i++) {
+      p.shooting.bullets[i].timer--;
+      if (p.shooting.bullets[i].timer <= 0) {
+        p.shooting.bullets.splice(i, 1);
+        i--;
+      } else {
+        closest = {
+          x: 0,
+          y: 0,
+          d: Infinity
+        };
+        for (var j = 0; j < players.length; j++) {
+          if (players[j] && players[j].n !== p.n) {
+            d = dist(p.shooting.bullets[i].x, p.shooting.bullets[i].y, players[j].x, players[j].y);
+            if (d < closest.d) {
+              closest = {
+                user: players[j].name + ":" + players[j].n,
+                x: players[j].x,
+                y: players[j].y,
+                d: d
+              };
+            }
           }
         }
+        o = rot(p.shooting.bullets[i].x, p.shooting.bullets[i].y, closest.x, closest.y);
+        p.shooting.bullets[i].xVel += cos(o) * 2;
+        p.shooting.bullets[i].yVel += sin(o) * 2;
+        p.shooting.xVel = constrain(p.shooting.bullets[i].xVel, -15, 15);
+        p.shooting.yVel = constrain(p.shooting.bullets[i].yVel, -15, 15);
+        p.shooting.bullets[i].x += p.shooting.bullets[i].xVel;
+        p.shooting.bullets[i].y += p.shooting.bullets[i].yVel;
       }
-      o = rot(p.shooting.bullets[i].x, p.shooting.bullets[i].y, closest.x, closest.y);
-      p.shooting.bullets[i].xVel += cos(o) * 2;
-      p.shooting.bullets[i].yVel += sin(o) * 2;
-      p.shooting.xVel = constrain(p.shooting.bullets[i].xVel, -15, 15);
-      p.shooting.yVel = constrain(p.shooting.bullets[i].yVel, -15, 15);
-      p.shooting.bullets[i].x += p.shooting.bullets[i].xVel;
-      p.shooting.bullets[i].y += p.shooting.bullets[i].yVel;
     }
+    if (mc && p.shooting.countdown <= 0 && p.n !== -1) {
+      p.shooting.bullets.push({
+        x: p.x,
+        y: p.y,
+        xVel: cos(off) * 15,
+        yVel: sin(off) * 15,
+        timer: 200
+      });
+      p.shooting.countdown = 2;
+    }
+    checkHit();
+    updatePlayer();
+    mc = false;
   }
-  if (mc && p.shooting.countdown <= 0 && p.n !== -1) {
-    p.shooting.bullets.push({
-      x: p.x,
-      y: p.y,
-      xVel: cos(off) * 15,
-      yVel: sin(off) * 15,
-      timer: 200
-    });
-    p.shooting.countdown = 2;
-  }
-  checkHit();
-  updatePlayer();
-  mc = false;
 }, 1000 / 50);
 
 function unload() {
-  ref.p.child(p.name + ":" + p.n).remove();
-  ref.hit.child(p.name + ":" + p.n).remove();
-  p.n = -1;
+  if (p.n !== -1) {
+    ref.p.child(p.name + ":" + p.n).remove();
+    ref.hit.child(p.name + ":" + p.n).remove();
+    p.n = -1;
+  }
 };
 
 document.ontouchmove = function(e) {
