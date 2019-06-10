@@ -1,5 +1,5 @@
 
-var ver = "V 0.4.0e4 - Alpha";
+var ver = "V 0.4.1 - Alpha";
 
 // Firebase config.
 var firebaseConfig = {
@@ -59,6 +59,9 @@ function join_game() {
       bullets: [],
       countdown: 0
     },
+    placed: {
+      turrets: []
+    },
     hit_immunity: 200
   };
   ref.n.once("value", function(data) {
@@ -96,7 +99,7 @@ function checkHit() {
         by: ""
       });
       if (p.hit_immunity <= 0) {
-        p.hit_immunity = 20;
+        p.hit_immunity = 15;
         p.health -= 10;
         if (p.health <= 0) {
           unload();
@@ -170,7 +173,7 @@ function miniMap(x, y, w, h) {
   }
 }
 
-var ox, oy, l, infot;
+var ox, oy, l, infot, cur;
 function draw() {
   if (p.n !== -1) {
     last.x = p.x;
@@ -225,6 +228,22 @@ function draw() {
           ellipse(players[i].shooting.bullets[b].x + ox, players[i].shooting.bullets[b].y + oy, 5, 5);
         }
       }
+      if (players[i].placed) {
+        for (var p in players[i].placed) {
+          for (var j in players[i].placed[p]) {
+            cur = players[i].placed[p][j];
+            switch(p) {
+              case "turrets":
+                noFill();
+                stroke(0);
+                strokeWeight(5);
+                ellipse(cur.x + ox, cur.y + oy, 30, 30);
+              break;
+            }
+            strokeWeight(1);
+          }
+        }
+      }
     }
   }
   if (p.n !== -1) {
@@ -264,6 +283,20 @@ function draw() {
             }
           }
         }
+      }
+    }
+    for (var p in p.placed) {
+      for (var j in p.placed[p]) {
+        cur = p.placed[p][j];
+        switch(p) {
+          case "turrets":
+            noFill();
+            stroke(0);
+            strokeWeight(5);
+            ellipse(cur.x + ox, cur.y + oy, 30, 30);
+          break;
+        }
+        strokeWeight(1);
       }
     }
     if (p.saying.countdown <= 0) {
@@ -347,7 +380,7 @@ setInterval(function() {
         p.shooting.bullets[i].y += p.shooting.bullets[i].yVel;
       }
     }
-    if (mc && p.shooting.countdown <= 0 && p.n !== -1) {
+    if (mc && p.shooting.countdown <= 0) {
       p.shooting.bullets.push({
         x: p.x,
         y: p.y,
@@ -356,6 +389,28 @@ setInterval(function() {
         timer: 200
       });
       p.shooting.countdown = 2;
+    }
+    if (kp[16] && p.shooting.countdown <= 0) {
+      p.placed.turrets.push({
+        x: p.x,
+        y: p.y,
+        health: 50,
+        countdown: 200
+      });
+      p.shooting.countdown = 2;
+    }
+    for (var i in p.placed.turrets) {
+      if (p.placed.turrets[i].conutdown <= 0) {
+        p.placed.turrets[i].conutdown = 3;
+        p.shooting.bullets.push({
+          x: p.placed.turrets[i].x,
+          y: p.placed.turrets[i].y,
+          xVel: 0,
+          yVel: 0,
+          timer: 100
+        });
+      }
+      p.placed.turrets[i].conutdown--;
     }
     checkHit();
     updatePlayer();
