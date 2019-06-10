@@ -9,9 +9,10 @@
     <script src="https://www.gstatic.com/firebasejs/6.1.0/firebase.js"></script>
     <script src="javascript.js"></script>
 
+    <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
     <style>
       html, body {
-        overflow: hidden;
+        /*overflow: hidden;*/
       }
       body {
         margin: 0px;
@@ -20,9 +21,106 @@
       canvas {
         vertical-align: top;
       }
+      h1 {
+        margin: 0px;
+        font-size: 24pt;
+        line-height: 24pt;
+        font-family: "Roboto";
+        color: rgb(50, 50, 50);
+      }
+      #name-container {
+        position: fixed;
+        left: calc(50% - 290px);
+        top: calc(50% - 120px);
+        padding: 40px;
+        width: 500px;
+        height: 160px;
+        background-color: rgb(255, 255, 255);
+        border-radius: 20px;
+        box-shadow: 0px 0px 10px rgba(200, 200, 200, 0.5);
+      }
+      #name-input {
+        width: calc(100% - 20px);
+        padding: 10px;
+        font-size: 18pt;
+        font-family: "Roboto";
+        background-color: rgb(255, 255, 255);
+        border-style: solid;
+        border-color: rgb(200, 200, 200);
+      }
+      #name-input:focus {
+        outline: none;
+        border-color: rgb(150, 150, 150);
+      }
+      #name-submit {
+        position: relative;
+        text-align: center;
+        font-size: 16pt;
+        font-family: "Roboto";
+        background-color: rgb(50, 200, 50);
+        color: rgb(255, 255, 255);
+        padding: 10px;
+        width: 200px;
+        left: calc(50% - 100px);
+        margin-top: 20px;
+        border-radius: 5px;
+      }
+      #name-submit:focus {
+        border: none;
+        outline: none;
+      }
+      #alert-container {
+        position: fixed;
+        left: calc(50% - 290px);
+        top: calc(50% + 170px);
+        padding: 40px;
+        width: 500px;
+        background-color: rgba(0, 0, 0, 0.58823529411);
+        border-radius: 20px;
+        max-height: calc(50% - 300px);
+        overflow: scroll;
+      }
+      .alert-important {
+        font-family: "Roboto";
+        background-color: rgba(200, 50, 50, 0.8);
+        color: rgb(255, 255, 255);
+        width: calc(100% - 40px);
+        padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 20px;
+      }
+      .alert-warn {
+        font-family: "Roboto";
+        background-color: rgba(200, 125, 50, 0.8);
+        color: rgb(255, 255, 255);
+        width: calc(100% - 40px);
+        padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 20px;
+      }
+      .alert-info {
+        font-family: "Roboto";
+        background-color: rgba(50, 125, 200, 0.8);
+        color: rgb(255, 255, 255);
+        width: calc(100% - 40px);
+        padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 20px;
+      }
+      /*
+        alert-important
+        alert-warn
+        alert-info
+      */
     </style>
   </head>
   <body onbeforeunload="unload()" onunload="unload()">
-
+    <div id="name-container">
+      <h1>Enter a username:</h1><br>
+      <input id="name-input" type="text" placeholder="piupiu.io">
+      <button id="name-submit" onclick="join_game()">Join</button>
+    </div>
+    <div id="alert-container">
+    </div>
   </body>
 </html>
