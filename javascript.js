@@ -174,12 +174,12 @@ function miniMap(x, y, w, h) {
 var ox, oy, l, infot, cur;
 function draw() {
   // remove old players
-  for (var i in players) {
-    if (players[i].last_updated <= new Date().getTime() - 30 * 1000) {
-      ref.hit.child(players[i].name + ":" + players[i].n).remove();
-      ref.p.child(players[i].name + ":" + players[i].n).remove();
-    }
-  }
+//   for (var i in players) {
+//     if (players[i].last_updated <= new Date().getTime() - 30 * 1000) {
+//       ref.hit.child(players[i].name + ":" + players[i].n).remove();
+//       ref.p.child(players[i].name + ":" + players[i].n).remove();
+//     }
+//   }
   if (p.n !== -1) {
     last.x = p.x;
     last.y = p.y;
