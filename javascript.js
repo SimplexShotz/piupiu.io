@@ -1,5 +1,5 @@
 
-var ver = "V 0.4.1e2 - Alpha";
+var ver = "V 0.4.1e3 - Alpha";
 
 // Firebase config.
 var firebaseConfig = {
@@ -396,8 +396,8 @@ setInterval(function() {
       p.shooting.countdown = 2;
     }
     for (var i in p.placed.turrets) {
-      if (p.placed.turrets[i].conutdown <= 0) {
-        p.placed.turrets[i].conutdown = 3;
+      if (p.placed.turrets[i].countdown <= 0) {
+        p.placed.turrets[i].countdown = 3;
         p.shooting.bullets.push({
           x: p.placed.turrets[i].x,
           y: p.placed.turrets[i].y,
@@ -406,7 +406,7 @@ setInterval(function() {
           timer: 100
         });
       }
-      p.placed.turrets[i].conutdown--;
+      p.placed.turrets[i].countdown--;
     }
     checkHit();
     updatePlayer();
