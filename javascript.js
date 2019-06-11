@@ -1,5 +1,5 @@
 
-var ver = "V 0.4.2 - Alpha";
+var ver = "V 0.4.2e1 - Alpha";
 
 // Firebase config.
 var firebaseConfig = {
@@ -177,6 +177,7 @@ function draw() {
     // remove old players
     for (var i in players) {
       if (players[i].last_updated <= new Date().getTime() - 30 * 1000) {
+        ref.hit.child(players[i].name + ":" + players[i].n).remove();
         ref.p.child(players[i].name + ":" + players[i].n).remove();
       }
     }
