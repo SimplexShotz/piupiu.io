@@ -1,5 +1,5 @@
 
-var ver = "V 0.4.1e3 - Alpha";
+var ver = "V 0.4.2 - Alpha";
 
 // Firebase config.
 var firebaseConfig = {
@@ -62,7 +62,9 @@ function join_game() {
     placed: {
       turrets: []
     },
-    hit_immunity: 200
+    hit_immunity: 200,
+    last_updated: new Date().getTime(),
+    version: ver
   };
   ref.n.once("value", function(data) {
     var d = data.val();
@@ -172,6 +174,12 @@ function miniMap(x, y, w, h) {
 var ox, oy, l, infot, cur;
 function draw() {
   if (p.n !== -1) {
+    // remove old players
+    for (var i in players) {
+      if (players[i].last_updated <= new Date().getTime() - 30 * 1000) {
+        ref.p.child(players[i].name + ":" + players[i].n).remove();
+      }
+    }
     last.x = p.x;
     last.y = p.y;
     p.hit_immunity--;
@@ -328,6 +336,7 @@ function draw() {
 var off, m, closest, d, o;
 setInterval(function() {
   if (p.n !== -1) {
+    p.last_updated = new Date().getTime();
     off = rot(window.innerWidth / 2, window.innerHeight / 2, mouseX, mouseY);
     m = min(dist(window.innerWidth / 2, window.innerHeight / 2, mouseX, mouseY) / min(window.innerHeight / 4, window.innerWidth / 4), 1);
     if (m <= 0.05) {
