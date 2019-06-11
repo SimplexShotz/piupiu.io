@@ -1,5 +1,5 @@
 
-var ver = "V 0.4.2e1 - Alpha";
+var ver = "V 0.4.3 - Alpha";
 
 // Firebase config.
 var firebaseConfig = {
@@ -212,40 +212,46 @@ function draw() {
   strokeWeight(5);
   for (var i in players) {
     if (players[i].n !== p.n) {
-      stroke(50);
-      if (players[i].hit_immunity > 0) {
-        stroke(25, 100, 200);
+      if (players[i].x + ox >= -window.innerWidth && players[i].x + ox <= 2 * window.innerWidth && players[i].y + oy >= -window.innerHeight && players[i].y + oy <= 2 * window.innerHeight) {
+        stroke(50);
+        if (players[i].hit_immunity > 0) {
+          stroke(25, 100, 200);
+        }
+        fill(200, 50, 50);
+        ellipse(players[i].x + ox, players[i].y + oy, 50, 50);
+        noStroke();
+        fill(0);
+        textAlign(CENTER, BOTTOM);
+        textSize(24);
+        text(players[i].name, players[i].x + ox, players[i].y + oy - 32);
+        textSize(16);
+        textAlign(CENTER, TOP);
+        text(players[i].saying.t + " [" + players[i].health + " HP]", players[i].x + ox, players[i].y + oy + 32);
       }
-      fill(200, 50, 50);
-      ellipse(players[i].x + ox, players[i].y + oy, 50, 50);
-      noStroke();
-      fill(0);
-      textAlign(CENTER, BOTTOM);
-      textSize(24);
-      text(players[i].name, players[i].x + ox, players[i].y + oy - 32);
-      textSize(16);
-      textAlign(CENTER, TOP);
-      text(players[i].saying.t + " [" + players[i].health + " HP]", players[i].x + ox, players[i].y + oy + 32);
       if (players[i].shooting && players[i].shooting.bullets) {
         for (var b = 0; b < players[i].shooting.bullets.length; b++) {
-          fill(0);
-          noStroke();
-          ellipse(players[i].shooting.bullets[b].x + ox, players[i].shooting.bullets[b].y + oy, 5, 5);
+          if (players[i].shooting.bullets[b].x + ox >= -window.innerWidth && players[i].shooting.bullets[b].x + ox <= 2 * window.innerWidth && players[i].shooting.bullets[b].y + oy >= -window.innerHeight && players[i].shooting.bullets[b].y + oy <= 2 * window.innerHeight) {
+            fill(0);
+            noStroke();
+            ellipse(players[i].shooting.bullets[b].x + ox, players[i].shooting.bullets[b].y + oy, 5, 5);
+          }
         }
       }
       if (players[i].placed) {
         for (var pl in players[i].placed) {
           for (var j in players[i].placed[pl]) {
             cur = players[i].placed[pl][j];
-            switch(pl) {
-              case "turrets":
-                noFill();
-                stroke(0);
-                strokeWeight(5);
-                ellipse(cur.x + ox, cur.y + oy, 30, 30);
-              break;
+            if (cur.x + ox >= -window.innerWidth && cur.x + ox <= 2 * window.innerWidth && cur.y + oy >= -window.innerHeight && cur.y + oy <= 2 * window.innerHeight) {
+              switch(pl) {
+                case "turrets":
+                  noFill();
+                  stroke(0);
+                  strokeWeight(5);
+                  ellipse(cur.x + ox, cur.y + oy, 30, 30);
+                break;
+              }
+              strokeWeight(1);
             }
-            strokeWeight(1);
           }
         }
       }
@@ -268,9 +274,11 @@ function draw() {
     text(p.saying.t + " [" + p.health + " HP]", window.innerWidth / 2, window.innerHeight / 2 + 32);
     for (var b = 0; b < p.shooting.bullets.length; b++) {
       if (p.shooting.bullets[b]) {
-        fill(0);
-        noStroke();
-        ellipse(p.shooting.bullets[b].x + ox, p.shooting.bullets[b].y + oy, 5, 5);
+        if (p.shooting.bullets[b].x + ox >= -window.innerWidth && p.shooting.bullets[b].x + ox <= 2 * window.innerWidth && p.shooting.bullets[b].y + oy >= -window.innerHeight && p.shooting.bullets[b].y + oy <= 2 * window.innerHeight) {
+          fill(0);
+          noStroke();
+          ellipse(p.shooting.bullets[b].x + ox, p.shooting.bullets[b].y + oy, 5, 5);
+        }
         if (p.n !== -1) {
           for (var i in players) {
             if (p.shooting.bullets[b] && players[i]) {
@@ -293,17 +301,20 @@ function draw() {
     for (var pl in p.placed) {
       for (var j in p.placed[pl]) {
         cur = p.placed[pl][j];
-        switch(pl) {
-          case "turrets":
-            noFill();
-            stroke(0);
-            strokeWeight(5);
-            ellipse(cur.x + ox, cur.y + oy, 30, 30);
-          break;
+        if (cur.x + ox >= -window.innerWidth && cur.x + ox <= 2 * window.innerWidth && cur.y + oy >= -window.innerHeight && cur.y + oy <= 2 * window.innerHeight) {
+          switch(pl) {
+            case "turrets":
+              noFill();
+              stroke(0);
+              strokeWeight(5);
+              ellipse(cur.x + ox, cur.y + oy, 30, 30);
+            break;
+          }
+          strokeWeight(1);
         }
-        strokeWeight(1);
       }
     }
+    noStroke();
     if (p.saying.countdown <= 0) {
       p.saying.t = "";
     }
