@@ -1,5 +1,5 @@
 
-var ver = "V 0.4.3 - Alpha";
+var ver = "V 0.4.3e1 - Alpha";
 
 // Firebase config.
 var firebaseConfig = {
@@ -173,14 +173,14 @@ function miniMap(x, y, w, h) {
 
 var ox, oy, l, infot, cur;
 function draw() {
-  if (p.n !== -1) {
-    // remove old players
-    for (var i in players) {
-      if (players[i].last_updated <= new Date().getTime() - 30 * 1000) {
-        ref.hit.child(players[i].name + ":" + players[i].n).remove();
-        ref.p.child(players[i].name + ":" + players[i].n).remove();
-      }
+  // remove old players
+  for (var i in players) {
+    if (players[i].last_updated <= new Date().getTime() - 30 * 1000) {
+      ref.hit.child(players[i].name + ":" + players[i].n).remove();
+      ref.p.child(players[i].name + ":" + players[i].n).remove();
     }
+  }
+  if (p.n !== -1) {
     last.x = p.x;
     last.y = p.y;
     p.hit_immunity--;
